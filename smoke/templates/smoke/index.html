@@ -19,10 +19,7 @@
     <![endif]-->
   </head>
   <body>
-  <center class="center">
-      <h1 class="h1">
-          <div style="padding: 2px; font-size: 44px;">空气污染：实时空气质量指数</div></h1>
-  </center>
+      <h1 class="h1">空气污染：实时空气质量指数</h1>
     {% if lastest_record %}
         <div>上传时间:{{ lastest_record.uploadtime }} </div>
         <div>空气质量{{ lastest_record.value }}</div>
@@ -30,6 +27,12 @@
     {% else %}
         <p class="p">No datas are available.</p>
     {% endif %}
+    {% if weekavg %}
+      <div>{{ weekavg }}</div>
+      {% endif %}
+ {% for data in Hlist %}
+      <div>{{ data }} </div>
+      {% endfor %}
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
