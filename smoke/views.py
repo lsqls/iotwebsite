@@ -28,5 +28,11 @@ def upload(request,value,longitude,latitude):
     info={"value":value,'longitude':longitude,'latitude':latitude}
     if(smoke.objects.create(**info)):
         return HttpResponse("Upload success")
-
-
+def mview(request):
+    lastest_record = smoke.objects.order_by('-id')[0]
+    now = datetime.now()
+    enddate = datetime(now.year, now.month, now.day, 0, 0)
+    weekago = enddate - timedelta(weeks=1)
+    weekavg = smoke.objects.filter(uploadtime__range=[weekago, enddate]).aggregate(Avg('value'))['value__avg']
+    content = {'lastest_record': lastest_record, 'weekavg': weekavg}
+    return render(request, 'smoke/mindex.html', content)
