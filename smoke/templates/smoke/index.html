@@ -34,13 +34,33 @@
       {% endif %}
 </div>
 
-<div id="map-container"  class="z-depth-1" style="position: absolute;left: 1%;top: 50%;height:300px;width:49%"></div>
 
+<div id="map"></div>
+    <script>
+      function initMap() {
+        var uluru = {lat: {{ lastest_record.latitude }}, lng: {{ lastest_record.longitude }}};
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 10,
+          center: uluru
+        });
+        var marker = new google.maps.Marker({
+          position: uluru,
+          map: map
+        });
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBK6tEL1KiUML6MxBmqBq6-KJtDnz-XdSk&callback=initMap">
+    </script>
 <div style="position: absolute;left: 50%;top: 1%;height:50%;width:49%">
 <canvas id="lineChart" ></canvas>
 </div>
 <div style="position: absolute;left: 50%;top: 50%;height:50%;width:49%;font-size:500%"> github项目地址<div style="font-size:5px">(实在不知道放什么在这里了)</div>&rarr;&rarr;<a href="https://github.com/lsqls/iotwebsite">iotweb</a></div>
-
+<style>
+       #map {
+        position: absolute;left: 1%;top: 50%;height:300px;width:49%
+       }
+    </style>
 
     <!-- JQuery -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -50,30 +70,8 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <!-- MDB core JavaScript -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJWEaQllzIw4AeX7uNvLtg858acLOa9Jw&callback=regular_map"
-  type="text/javascript"></script>
 
-<script>
 
-function regular_map() {
-    var var_location = new google.maps.LatLng({{ lastest_record.latitude }},{{ lastest_record.longitude }});
-
-    var var_mapoptions = {
-        center: var_location,
-        zoom: 14
-    };
-
-    var var_map = new google.maps.Map(document.getElementById("map-container"),
-        var_mapoptions);
-
-    var var_marker = new google.maps.Marker({
-        position: var_location,
-        map: var_map,
-        title: "New York"
-    });
-}
-      google.maps.event.addDomListener(window, 'load', regular_map);
-    </script>
 <script>
 var ctxL = document.getElementById("lineChart").getContext('2d');
 var myLineChart = new Chart(ctxL, {
