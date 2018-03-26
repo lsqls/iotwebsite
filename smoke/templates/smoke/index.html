@@ -4,23 +4,12 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
     <title>实时空气质量</title>
-<!-- Font Awesome -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-<!-- Bootstrap core CSS -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
-<!-- Material Design Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/css/mdb.min.css" rel="stylesheet">
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
   </head>
   <body>
-
 <div id="data" style="position: absolute;left: 10%;top: 10%;height:49%;width:49%">
                     {% if lastest_record %}
         <div>上传时间：{{ lastest_record.uploadtime }} </div>
@@ -33,10 +22,30 @@
       <div>一周内平均值：{{ weekavg }}</div>
       {% endif %}
 </div>
-
-
 <div id="map"></div>
-    <script>
+
+<div style="position: absolute;left: 50%;top: 1%;height:50%;width:49%">
+<canvas id="lineChart" ></canvas>
+</div>
+<div style="position: absolute;left: 50%;top: 50%;height:50%;width:49%;font-size:500%"> github项目地址<div style="font-size:5px">(实在不知道放什么在这里了)</div>&rarr;&rarr;<a href="https://github.com/lsqls/iotwebsite">iotweb</a></div>
+
+
+<style>
+       #map {
+        position: absolute;left: 1%;top: 50%;height:300px;width:49%
+       }
+    </style>
+
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
+ <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBK6tEL1KiUML6MxBmqBq6-KJtDnz-XdSk&callback=initMap">
+    </script>
+
+<script>
       function initMap() {
         var uluru = {lat: {{ lastest_record.latitude }}, lng: {{ lastest_record.longitude }}};
         var map = new google.maps.Map(document.getElementById('map'), {
@@ -49,27 +58,6 @@
         });
       }
     </script>
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBK6tEL1KiUML6MxBmqBq6-KJtDnz-XdSk&callback=initMap">
-    </script>
-<div style="position: absolute;left: 50%;top: 1%;height:50%;width:49%">
-<canvas id="lineChart" ></canvas>
-</div>
-<div style="position: absolute;left: 50%;top: 50%;height:50%;width:49%;font-size:500%"> github项目地址<div style="font-size:5px">(实在不知道放什么在这里了)</div>&rarr;&rarr;<a href="https://github.com/lsqls/iotwebsite">iotweb</a></div>
-<style>
-       #map {
-        position: absolute;left: 1%;top: 50%;height:300px;width:49%
-       }
-    </style>
-
-    <!-- JQuery -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<!-- Bootstrap tooltips -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
-<!-- Bootstrap core JavaScript -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
-<!-- MDB core JavaScript -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
 
 
 <script>
@@ -77,17 +65,17 @@ var ctxL = document.getElementById("lineChart").getContext('2d');
 var myLineChart = new Chart(ctxL, {
     type: 'line',
     data: {
-        labels: ["1", "2", "3", "4", "5", "6"],
+        labels: ["0","1", "2", "3", "4", "5"],
         datasets: [
             {
-                label: "6小时",
+                label: "6小时内曲线图",
                 fillColor: "rgba(220,220,220,0.2)",
                 strokeColor: "rgba(220,220,220,1)",
                 pointColor: "rgba(220,220,220,1)",
                 pointStrokeColor: "#fff",
                 pointHighlightFill: "#fff",
                 pointHighlightStroke: "rgba(220,220,220,1)",
-                data: [{{data0}},{{data1}},{{data2}},{{data3}},{{data4}},{{data5}}]
+                data: [{{data5}},{{data4}},{{data3}},{{data2}},{{data1}},{{data0}}]
             }
 
         ]
