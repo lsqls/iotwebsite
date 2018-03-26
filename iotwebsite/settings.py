@@ -25,7 +25,7 @@ SECRET_KEY = 'jt#jl64p!l692xk=5wjalz!-x&=eqf=dsmrpyxx300&vk(-@%k'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [u'10.122.234.95',u'127.0.0.1']
+ALLOWED_HOSTS = [u'0.0.0.0',u'127.0.0.1',u'10.122.234.95',u'123.207.143.140']
 
 
 # Application definition
