@@ -13,7 +13,7 @@ def index(request):
     weekago = enddate - timedelta(weeks=1)
     weekavg = smoke.objects.filter(uploadtime__range=[weekago, enddate]).aggregate(Avg('value'))['value__avg']
     Hlist = []
-    for i in range(1, 7):
+    for i in range(2, 8):
         starthour = datetime(now.year, now.month, now.day, now.hour - i, 0)
         endhour=starthour+timedelta(hours=1)
         houravg = smoke.objects.filter(uploadtime__range=[starthour,endhour ]).aggregate(Avg('value'))['value__avg']
