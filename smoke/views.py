@@ -28,6 +28,10 @@ def upload(request,value,longitude,latitude):
     info={"value":value,'longitude':longitude,'latitude':latitude}#数值-经度-纬度
     if(smoke.objects.create(**info)):
         return HttpResponse("Upload success")
+def uploadv(request,value):
+    info={"value":value,}#数值
+    if(smoke.objects.create(**info)):
+        return HttpResponse("Upload success")
 def mview(request):
     lastest_record = smoke.objects.order_by('-id')[0]
     now = datetime.now()

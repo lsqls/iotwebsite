@@ -125,7 +125,7 @@ void setup()
   if(started)
   {
     sendSMS("13051680866","start");
-//    ggps();//lon lat
+    ggps();//lon lat
     httpg("iot.myworkroom.cn",80,"/");
     delay(1000);
   }
@@ -135,7 +135,7 @@ void loop()
 {
   value=getvalue();
   if(value>1000)  sendSMS("13051680866","fire");
- //  ggps();
+   ggps();
    valuestr=dtostrf(value,3,2,buffer);
    sprintf(datastr, "/smoke/upload/%s-%s-%s", valuestr,lon,lat);
    Serial.println(datastr);
