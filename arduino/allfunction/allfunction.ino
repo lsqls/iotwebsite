@@ -1,5 +1,25 @@
 #include "SIM900.h"
 #include <SoftwareSerial.h>
+//此处为了兼容其他的多串口Arduino板子
+//#define GpsSerial  Serial
+#define DebugSerial Serial
+int L = 13; //LED指示灯引脚
+SoftwareSerial GpsSerial(5, 6);
+struct
+{
+  char GPS_Buffer[80];
+  bool isGetData;    //是否获取到GPS数据
+  bool isParseData; //是否解析完成
+  char UTCTime[11];   //UTC时间
+  char latitude[11];    //纬度
+  char N_S[2];    //N/S
+  char longitude[12];   //经度
+  char E_W[2];    //E/W
+  bool isUsefull;   //定位信息是否有效
+} Save_Data;
+
+
+
 //If not used, is better to exclude the HTTP library,
 //for RAM saving.
 //If your sketch reboots itself proprably you have finished,
@@ -8,11 +28,12 @@
 
 //If you want to use the Arduino functions to manage SMS, uncomment the lines below.
 #include "sms.h"
-#include "gps.h"
+//#include "gps.h"
 #include "inetGSM.h"
 SMSGSM sms;
-GPSGSM gps;
+//GPSGSM gps;
 InetGSM inet;
+int smokepin=A0;
 //To change pins for Software Serial, use the two lines in GSM.cpp.
 
 //GSM Shield for Arduino
@@ -20,16 +41,20 @@ InetGSM inet;
 //this code is based on the example of Arduino Labs.
 
 //Simple sketch to send and receive SMS.
-
+const unsigned int gpsRxBufferLength = 600;
+char gpsRxBuffer[gpsRxBufferLength];
+unsigned int ii = 0;
 int numdata;
 boolean started=false;
 char smsbuffer[160];
 char n[20];
-char lon[15]="116.0";//set default lon,lat
-char lat[15]="40.0";
+/*char lon[15];//set default lon,lat
+char lat[15];
 char alt[15];
 char time[20];
 char vel[15];
+*/
+
 char msg1[5];
 char msg2[5];
 char stat;
@@ -48,7 +73,7 @@ int sendSMS(char* number,char* message)
       return 1;
     return 0;
 }
-int ggps()
+/*int ggps()
 {
         if (gps.attachGPS())
       Serial.println("gpsstatus=GPSREADY");
@@ -79,6 +104,13 @@ int ggps()
   return 1;
 
 }
+*/
+void ggps()
+{
+  gpsRead();  //获取GPS数据
+  parseGpsBuffer();//解析GPS数据
+  //printGpsBuffer();//输出解析后的数据
+}
 void httpg(char* host,int port,char* path)
 {
   if (inet.attachGPRS("internet.wind", "", ""))
@@ -105,7 +137,9 @@ void httpg(char* host,int port,char* path)
   }
 float getvalue()
 {  
-  float value=500.0;
+  float value=analogRead(smokepin);
+  Serial.print("Value:");
+  Serial.println(value);
   return value;
 }
 
@@ -121,12 +155,21 @@ void setup()
     started=true;  
   }
   else Serial.println("\nstatus=IDLE");
-  
+  pinMode(smokepin,INPUT);
+ /* {//gps初始化
+  GpsSerial.begin(9600);      //定义波特率9600
+  DebugSerial.println("Wating...");
+  Save_Data.isGetData = false;
+  Save_Data.isParseData = false;
+  Save_Data.isUsefull = false;
+  }
+  */
+
   if(started)
   {
     sendSMS("13051680866","start");
+    httpg("iot.myworkroom.cn",80,"/"); 
     ggps();//lon lat
-    httpg("iot.myworkroom.cn",80,"/");
     delay(1000);
   }
 };
@@ -137,7 +180,8 @@ void loop()
   if(value>1000)  sendSMS("13051680866","fire");
    ggps();
    valuestr=dtostrf(value,3,2,buffer);
-   sprintf(datastr, "/smoke/upload/%s-%s-%s", valuestr,lon,lat);
+   sprintf(datastr, "/smoke/upload/%s-%s-%s", valuestr,Save_Data.longitude,Save_Data.latitude);
+   Serial.print("DataString:");
    Serial.println(datastr);
    httpg("iot.myworkroom.cn",80,datastr);
  //Read for new byte on serial hardware,
@@ -184,3 +228,129 @@ void loop()
 void serialswread(){
   gsm.SimpleRead();
 }
+void errorLog(int num)
+{
+  DebugSerial.print("ERROR");
+  DebugSerial.println(num);
+  while (1)
+  {
+    digitalWrite(L, HIGH);
+    delay(300);
+    digitalWrite(L, LOW);
+    delay(300);
+  }
+}
+
+void printGpsBuffer()
+{
+  if (Save_Data.isParseData)
+  {
+    Save_Data.isParseData = false;
+
+    DebugSerial.print("Save_Data.UTCTime = ");
+    DebugSerial.println(Save_Data.UTCTime);
+
+    if (Save_Data.isUsefull)
+    {
+      Save_Data.isUsefull = false;
+      DebugSerial.print("Save_Data.latitude = ");
+      DebugSerial.println(Save_Data.latitude);
+      DebugSerial.print("Save_Data.N_S = ");
+      DebugSerial.println(Save_Data.N_S);
+      DebugSerial.print("Save_Data.longitude = ");
+      DebugSerial.println(Save_Data.longitude);
+      DebugSerial.print("Save_Data.E_W = ");
+      DebugSerial.println(Save_Data.E_W);
+    }
+    else
+    {
+      DebugSerial.println("GPS DATA is not usefull!");
+    }
+
+  }
+}
+
+void parseGpsBuffer()
+{
+  char *subString;
+  char *subStringNext;
+  if (Save_Data.isGetData)
+  {
+    Save_Data.isGetData = false;
+    DebugSerial.println("**************");
+    DebugSerial.println(Save_Data.GPS_Buffer);
+
+
+    for (int i = 0 ; i <= 6 ; i++)
+    {
+      if (i == 0)
+      {
+        if ((subString = strstr(Save_Data.GPS_Buffer, ",")) == NULL)
+          errorLog(1);  //解析错误
+      }
+      else
+      {
+        subString++;
+        if ((subStringNext = strstr(subString, ",")) != NULL)
+        {
+          char usefullBuffer[2];
+          switch (i)
+          {
+            case 1: memcpy(Save_Data.UTCTime, subString, subStringNext - subString); break; //获取UTC时间
+            case 2: memcpy(usefullBuffer, subString, subStringNext - subString); break; //获取UTC时间
+            case 3: memcpy(Save_Data.latitude, subString, subStringNext - subString); break; //获取纬度信息
+            case 4: memcpy(Save_Data.N_S, subString, subStringNext - subString); break; //获取N/S
+            case 5: memcpy(Save_Data.longitude, subString, subStringNext - subString); break; //获取纬度信息
+            case 6: memcpy(Save_Data.E_W, subString, subStringNext - subString); break; //获取E/W
+
+            default: break;
+          }
+
+          subString = subStringNext;
+          Save_Data.isParseData = true;
+          if (usefullBuffer[0] == 'A')
+            Save_Data.isUsefull = true;
+          else if (usefullBuffer[0] == 'V')
+            Save_Data.isUsefull = false;
+
+        }
+        else
+        {
+          errorLog(2);  //解析错误
+        }
+      }
+
+
+    }
+  }
+}
+
+
+void clrGpsRxBuffer(void)
+{
+  memset(gpsRxBuffer, 0, gpsRxBufferLength);      //清空
+  ii = 0;
+}
+void gpsRead() {
+  while (GpsSerial.available())
+  {
+    gpsRxBuffer[ii++] = GpsSerial.read();
+    if (ii == gpsRxBufferLength)clrGpsRxBuffer();
+  }
+
+  char* GPS_BufferHead;
+  char* GPS_BufferTail;
+  if ((GPS_BufferHead = strstr(gpsRxBuffer, "$GPRMC,")) != NULL || (GPS_BufferHead = strstr(gpsRxBuffer, "$GNRMC,")) != NULL )
+  {
+    if (((GPS_BufferTail = strstr(GPS_BufferHead, "\r\n")) != NULL) && (GPS_BufferTail > GPS_BufferHead))
+    {
+      memcpy(Save_Data.GPS_Buffer, GPS_BufferHead, GPS_BufferTail - GPS_BufferHead);
+      Save_Data.isGetData = true;
+
+      clrGpsRxBuffer();
+    }
+  }
+}
+
+
+
