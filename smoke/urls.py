@@ -8,6 +8,6 @@ urlpatterns = [
  #   url(r'^upload/(\d+.\d+)-(\d+.\d+)-(\d+.\d+)$', views.upload, name='upload'),
     url(r'^upload/(.+)-(.+)-(.+)$', views.upload, name='upload'),
     url(r'^mindex$',views.mview,name='phone-view'),
-    url(r'^upload/(.+)--$', views.uploadv, name='uploadv'),
+    url(r'^upload/(.+)$', views.uploadv, name='uploadv'),
 
 ]

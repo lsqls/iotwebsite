@@ -25,7 +25,9 @@ def index(request):
              'data1': Hlist[1],'data2':Hlist[2],'data3':Hlist[3],'data4':Hlist[4],'data5':Hlist[5]}
     return render(request,'smoke/index.html',content)
 def upload(request,value,longitude,latitude):
-    info={"value":value,'longitude':longitude,'latitude':latitude}#数值-经度-纬度
+    lon=float(longitude[0:3])+float(longitude[3:])/60.0
+    lat=float(latitude[0:2])+float(latitude[2:])/60.0
+    info={"value":value,'longitude':lon,'latitude':lat}#数值-经度-纬度
     if(smoke.objects.create(**info)):
         return HttpResponse("Upload success")
 def uploadv(request,value):

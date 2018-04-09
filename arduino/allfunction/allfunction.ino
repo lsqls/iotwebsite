@@ -1,21 +1,21 @@
 #include "SIM900.h"
 #include <SoftwareSerial.h>
-//此处为了兼容其他的多串口Arduino板子
+
 //#define GpsSerial  Serial
 #define DebugSerial Serial
-int L = 13; //LED指示灯引脚
+int L = 13; 
 SoftwareSerial GpsSerial(5, 6);
 struct
 {
   char GPS_Buffer[80];
-  bool isGetData;    //是否获取到GPS数据
-  bool isParseData; //是否解析完成
-  char UTCTime[11];   //UTC时间
-  char latitude[11];    //纬度
-  char N_S[2];    //N/S
-  char longitude[12];   //经度
-  char E_W[2];    //E/W
-  bool isUsefull;   //定位信息是否有效
+  bool isGetData;    
+  bool isParseData; 
+  char UTCTime[11];  
+  char latitude[11];   
+  char N_S[2];   
+  char longitude[12];   
+  char E_W[2];    
+  bool isUsefull; 
 } Save_Data;
 
 
@@ -33,7 +33,7 @@ struct
 SMSGSM sms;
 //GPSGSM gps;
 InetGSM inet;
-int smokepin=A0;
+int smokepin = A0;
 //To change pins for Software Serial, use the two lines in GSM.cpp.
 
 //GSM Shield for Arduino
@@ -45,44 +45,44 @@ const unsigned int gpsRxBufferLength = 600;
 char gpsRxBuffer[gpsRxBufferLength];
 unsigned int ii = 0;
 int numdata;
-boolean started=false;
+boolean started = false;
 char smsbuffer[160];
 char n[20];
 /*char lon[15];//set default lon,lat
-char lat[15];
-char alt[15];
-char time[20];
-char vel[15];
+  char lat[15];
+  char alt[15];
+  char time[20];
+  char vel[15];
 */
 
 char msg1[5];
 char msg2[5];
 char stat;
 char inSerial[20];
-int i=0;
+int i = 0;
 char msg[50];
 char datastr[50];
 float value;
 char* valuestr;
 char buffer[4];
-int sendSMS(char* number,char* message)
+int sendSMS(char* number, char* message)
 {
-   //Enable this two lines if you want to send an SMS.
-    if (sms.SendSMS(number, message))
-      Serial.println("\nSMS sent OK");
-      return 1;
-    return 0;
+  //Enable this two lines if you want to send an SMS.
+  if (sms.SendSMS(number, message))
+    Serial.println("\nSMS sent OK");
+  return 1;
+  return 0;
 }
 /*int ggps()
-{
+  {
         if (gps.attachGPS())
       Serial.println("gpsstatus=GPSREADY");
-    else 
+    else
     {
       Serial.println("gpsstatus=ERROR");
       return 0;
     }
-  
+
     delay(20000); //Time for fixing
     stat=gps.getStat();
   if(stat==1)
@@ -103,129 +103,132 @@ int sendSMS(char* number,char* message)
   Serial.println(vel);
   return 1;
 
-}
+  }
 */
 void ggps()
 {
-  gpsRead();  //获取GPS数据
-  parseGpsBuffer();//解析GPS数据
-  //printGpsBuffer();//输出解析后的数据
+  gpsRead();  
+  parseGpsBuffer();
+  //printGpsBuffer();
 }
-void httpg(char* host,int port,char* path)
+void httpg(char* host, int port, char* path)
 {
   if (inet.attachGPRS("internet.wind", "", ""))
-      Serial.println("gprsstatus=ATTACHED");
-    else Serial.println("gprsstatus=ERROR");
-    delay(1000);
-    
-    //Read IP address.
-    gsm.SimpleWriteln("AT+CIFSR");
-    delay(5000);
-    //Read until serial buffer is empty.
-    gsm.WhileSimpleRead();
-  
-    //TCP Client GET, send a GET request to the server and
-    //save the reply.
-   // numdata=inet.httpGET("www.baidu.com", 80, "/", msg, 50);//
-    numdata=inet.httpGET(host, port, path, msg, 50);
-    //Print the results.
-    Serial.println("\nNumber of data received:");
-    Serial.println(numdata);  
-    Serial.println("\nData received:"); 
-    Serial.println(msg); 
-  
-  }
+    Serial.println("gprsstatus=ATTACHED");
+  else Serial.println("gprsstatus=ERROR");
+  delay(1000);
+
+  //Read IP address.
+  gsm.SimpleWriteln("AT+CIFSR");
+  delay(5000);
+  //Read until serial buffer is empty.
+  gsm.WhileSimpleRead();
+
+  //TCP Client GET, send a GET request to the server and
+  //save the reply.
+  // numdata=inet.httpGET("www.baidu.com", 80, "/", msg, 50);//
+  numdata = inet.httpGET(host, port, path, msg, 50);
+  //Print the results.
+  Serial.println("\nNumber of data received:");
+  Serial.println(numdata);
+  Serial.println("\nData received:");
+  Serial.println(msg);
+
+}
 float getvalue()
-{  
-  float value=analogRead(smokepin);
+{
+  float value = analogRead(smokepin);
   Serial.print("Value:");
   Serial.println(value);
   return value;
 }
 
-void setup() 
+void setup()
 {
   //Serial connection.
   Serial.begin(9600);
   Serial.println("GSM Shield testing.");
   //Start configuration of shield with baudrate.
   //For http uses is raccomanded to use 4800 or slower.
-  if (gsm.begin(2400)){
+  if (gsm.begin(2400)) {
     Serial.println("\nGSMstatus=READY");
-    started=true;  
+    started = true;
   }
   else Serial.println("\nstatus=IDLE");
-  pinMode(smokepin,INPUT);
- /* {//gps初始化
-  GpsSerial.begin(9600);      //定义波特率9600
-  DebugSerial.println("Wating...");
-  Save_Data.isGetData = false;
-  Save_Data.isParseData = false;
-  Save_Data.isUsefull = false;
-  }
+  pinMode(smokepin, INPUT);
+  /* {
+    GpsSerial.begin(9600);      
+    DebugSerial.println("Wating...");
+    Save_Data.isGetData = false;
+    Save_Data.isParseData = false;
+    Save_Data.isUsefull = false;
+    }
   */
 
-  if(started)
+  if (started)
   {
-    sendSMS("13051680866","start");
-    httpg("iot.myworkroom.cn",80,"/"); 
+    sendSMS("13051680866", "start");
+    httpg("iot.myworkroom.cn", 80, "/");
     ggps();//lon lat
     delay(1000);
   }
 };
 
-void loop() 
+void loop()
 {
-  value=getvalue();
-  if(value>1000)  sendSMS("13051680866","fire");
-   ggps();
-   valuestr=dtostrf(value,3,2,buffer);
-   sprintf(datastr, "/smoke/upload/%s-%s-%s", valuestr,Save_Data.longitude,Save_Data.latitude);
-   Serial.print("DataString:");
-   Serial.println(datastr);
-   httpg("iot.myworkroom.cn",80,datastr);
- //Read for new byte on serial hardware,
+  value = getvalue();
+  if (value > 1000)  sendSMS("13051680866", "fire");
+  ggps();
+  valuestr = dtostrf(value, 3, 2, buffer);
+  if (Save_Data.isUsefull)
+    sprintf(datastr, "/smoke/upload/%s-%s-%s", valuestr, Save_Data.longitude, Save_Data.latitude);
+  else
+    sprintf(datastr, "/smoke/upload/%s", valuestr);
+  Serial.print("DataString:");
+  Serial.println(datastr);
+  httpg("iot.myworkroom.cn", 80, datastr);
+  //Read for new byte on serial hardware,
   //and write them on NewSoftSerial.
   serialhwread();
   //Read for new byte on NewSoftSerial.
   serialswread();
   delay(3000);
 };
- void serialhwread()
- {
-  i=0;
-  if (Serial.available() > 0){            
+void serialhwread()
+{
+  i = 0;
+  if (Serial.available() > 0) {
     while (Serial.available() > 0) {
-      inSerial[i]=(Serial.read());
+      inSerial[i] = (Serial.read());
       delay(10);
-      i++;      
+      i++;
     }
-    
-    inSerial[i]='\0';
-    if(!strcmp(inSerial,"/END")){
+
+    inSerial[i] = '\0';
+    if (!strcmp(inSerial, "/END")) {
       Serial.println("_");
-      inSerial[0]=0x1a;
-      inSerial[1]='\0';
+      inSerial[0] = 0x1a;
+      inSerial[1] = '\0';
       gsm.SimpleWriteln(inSerial);
     }
     //Send a saved AT command using serial port.
-    if(!strcmp(inSerial,"TEST")){
+    if (!strcmp(inSerial, "TEST")) {
       Serial.println("SIGNAL QUALITY");
       gsm.SimpleWriteln("AT+CSQ");
     }
     //Read last message saved.
-    if(!strcmp(inSerial,"MSG")){
+    if (!strcmp(inSerial, "MSG")) {
       Serial.println(msg);
     }
-    else{
+    else {
       Serial.println(inSerial);
       gsm.SimpleWriteln(inSerial);
-    }    
-    inSerial[0]='\0';
+    }
+    inSerial[0] = '\0';
   }
 }
 
-void serialswread(){
+void serialswread() {
   gsm.SimpleRead();
 }
 void errorLog(int num)
@@ -286,7 +289,7 @@ void parseGpsBuffer()
       if (i == 0)
       {
         if ((subString = strstr(Save_Data.GPS_Buffer, ",")) == NULL)
-          errorLog(1);  //解析错误
+          errorLog(1); 
       }
       else
       {
@@ -296,12 +299,12 @@ void parseGpsBuffer()
           char usefullBuffer[2];
           switch (i)
           {
-            case 1: memcpy(Save_Data.UTCTime, subString, subStringNext - subString); break; //获取UTC时间
-            case 2: memcpy(usefullBuffer, subString, subStringNext - subString); break; //获取UTC时间
-            case 3: memcpy(Save_Data.latitude, subString, subStringNext - subString); break; //获取纬度信息
-            case 4: memcpy(Save_Data.N_S, subString, subStringNext - subString); break; //获取N/S
-            case 5: memcpy(Save_Data.longitude, subString, subStringNext - subString); break; //获取纬度信息
-            case 6: memcpy(Save_Data.E_W, subString, subStringNext - subString); break; //获取E/W
+            case 1: memcpy(Save_Data.UTCTime, subString, subStringNext - subString); break; 
+            case 2: memcpy(usefullBuffer, subString, subStringNext - subString); break; 
+            case 3: memcpy(Save_Data.latitude, subString, subStringNext - subString); break; 
+            case 4: memcpy(Save_Data.N_S, subString, subStringNext - subString); break; 
+            case 5: memcpy(Save_Data.longitude, subString, subStringNext - subString); break; 
+            case 6: memcpy(Save_Data.E_W, subString, subStringNext - subString); break;
 
             default: break;
           }
@@ -316,7 +319,7 @@ void parseGpsBuffer()
         }
         else
         {
-          errorLog(2);  //解析错误
+          errorLog(2);  
         }
       }
 
@@ -328,7 +331,7 @@ void parseGpsBuffer()
 
 void clrGpsRxBuffer(void)
 {
-  memset(gpsRxBuffer, 0, gpsRxBufferLength);      //清空
+  memset(gpsRxBuffer, 0, gpsRxBufferLength);      
   ii = 0;
 }
 void gpsRead() {
@@ -351,6 +354,8 @@ void gpsRead() {
     }
   }
 }
+
+
 
 
 
