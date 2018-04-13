@@ -30,7 +30,7 @@ struct
 #include "sms.h"
 //#include "gps.h"
 #include "inetGSM.h"
-//SMSGSM sms;
+SMSGSM sms;
 //GPSGSM gps;
 InetGSM inet;
 int smokepin = A0;
@@ -41,13 +41,13 @@ int smokepin = A0;
 //this code is based on the example of Arduino Labs.
 
 //Simple sketch to send and receive SMS.
-const unsigned int gpsRxBufferLength = 10;
+const unsigned int gpsRxBufferLength = 600;
 char gpsRxBuffer[gpsRxBufferLength];
 unsigned int ii = 0;
 int numdata;
 boolean started = false;
 //char smsbuffer[160];
-char n[20];
+//char n[20];
 //char msg1[5];
 //char msg2[5];
 //char stat;
@@ -58,14 +58,14 @@ char datastr[30];
 float value;
 char* valuestr;
 char buffer[4];
-//int sendSMS(char* number, char* message)
-//{
-//  //Enable this two lines if you want to send an SMS.
-//  if (sms.SendSMS(number, message))
-//    Serial.println("\nSMS sent OK");
-//  return 1;
-//  return 0;
-//}
+int sendSMS(char* number, char* message)
+{
+  //Enable this two lines if you want to send an SMS.
+  if (sms.SendSMS(number, message))
+    Serial.println("MSS");//message send success
+  return 1;
+  return 0;
+}
 
 void ggps()
 {
@@ -76,8 +76,8 @@ void ggps()
 void httpg(char* host, int port, char* path)
 {
   if (inet.attachGPRS("internet.wind", "", ""))
-    Serial.println("gprsstatus=ATTACHED");
-  else Serial.println("gprsstatus=ERROR");
+    Serial.println("PAT");//PAT    gprs attached
+  else Serial.println("PE");//PE gprs eorro
   delay(1000);
 
   //Read IP address.
@@ -91,17 +91,17 @@ void httpg(char* host, int port, char* path)
   // numdata=inet.httpGET("www.baidu.com", 80, "/", msg, 50);//
   numdata = inet.httpGET(host, port, path, msg, 50);
   //Print the results.
-  Serial.println("\nNumber of data received:");
+  Serial.println("NRC");//NRC Number of data received:
   Serial.println(numdata);
-  Serial.println("\nData received:");
-  Serial.println(msg);
+//  Serial.println("DRC");//DRC Data received:
+  //Serial.println(msg);
 
 }
 float getvalue()
 {
   float value = analogRead(smokepin);
-  Serial.print("Value:");
-  Serial.println(value);
+//  Serial.print("Value:");
+  //Serial.println(value);
   return value;
 }
 
@@ -109,22 +109,18 @@ void setup()
 {
   //Serial connection.
   Serial.begin(9600);
-  Serial.println("GSM Shield testing.");
+  Serial.println("GSM..");//
   //Start configuration of shield with baudrate.
   //For http uses is raccomanded to use 4800 or slower.
   if (gsm.begin(2400)) {
-    Serial.println("\nGSMstatus=READY");
+    Serial.println("READY");
     started = true;
   }
-  else Serial.println("\nstatus=IDLE");
+  else Serial.println("IDLE");
   pinMode(smokepin, INPUT);
   if (started)
   {
-      gsm.SimpleWrite("AT+CMGS=");
-      gsm.SimpleWriteln("13911952518");
-      gsm.SimpleWriteln("STRAT");
-      gsm.SimpleWrite(0x1A);
-      // sendSMS("13051680866", "start");
+    sendSMS("13051680866", "start");
     httpg("iot.myworkroom.cn", 80, "/");
     ggps();//lon lat
     delay(1000);
@@ -134,7 +130,7 @@ void setup()
 void loop()
 {
   value = getvalue();
- // if (value > 1000)     sendSMS("13051680866", "fire");
+  if (value > 1000)  sendSMS("13051680866", "fire");
   ggps();
   valuestr = dtostrf(value, 3, 2, buffer);
   if (Save_Data.isUsefull)
@@ -146,7 +142,7 @@ void loop()
   httpg("iot.myworkroom.cn", 80, datastr);
   //Read for new byte on serial hardware,
   //and write them on NewSoftSerial.
-  serialhwread();
+ serialhwread();
   //Read for new byte on NewSoftSerial.
   serialswread();
   delay(3000);
@@ -201,7 +197,7 @@ void errorLog(int num)
   }
 }
 
-void printGpsBuffer()
+/*void printGpsBuffer()
 {
   if (Save_Data.isParseData)
   {
@@ -224,12 +220,12 @@ void printGpsBuffer()
     }
     else
     {
-      DebugSerial.println("GPS DATA is not usefull!");
+      DebugSerial.println("GDE");
     }
 
   }
 }
-
+*/
 void parseGpsBuffer()
 {
   char *subString;
@@ -237,8 +233,8 @@ void parseGpsBuffer()
   if (Save_Data.isGetData)
   {
     Save_Data.isGetData = false;
-    DebugSerial.println("**************");
-    DebugSerial.println(Save_Data.GPS_Buffer);
+    //DebugSerial.println("**************");
+    //DebugSerial.println(Save_Data.GPS_Buffer);
 
 
     for (int i = 0 ; i <= 6 ; i++)
