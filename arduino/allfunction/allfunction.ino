@@ -46,22 +46,15 @@ char gpsRxBuffer[gpsRxBufferLength];
 unsigned int ii = 0;
 int numdata;
 boolean started = false;
-char smsbuffer[160];
+//char smsbuffer[160];
 char n[20];
-/*char lon[15];//set default lon,lat
-  char lat[15];
-  char alt[15];
-  char time[20];
-  char vel[15];
-*/
-
-char msg1[5];
-char msg2[5];
-char stat;
+//char msg1[5];
+//char msg2[5];
+//char stat;
 char inSerial[20];
 int i = 0;
 char msg[50];
-char datastr[50];
+char datastr[30];
 float value;
 char* valuestr;
 char buffer[4];
@@ -73,38 +66,7 @@ int sendSMS(char* number, char* message)
   return 1;
   return 0;
 }
-/*int ggps()
-  {
-        if (gps.attachGPS())
-      Serial.println("gpsstatus=GPSREADY");
-    else
-    {
-      Serial.println("gpsstatus=ERROR");
-      return 0;
-    }
 
-    delay(20000); //Time for fixing
-    stat=gps.getStat();
-  if(stat==1)
-    Serial.println("NOT FIXED");
-  else if(stat==0)
-    Serial.println("GPS OFF");
-  else if(stat==2)
-    Serial.println("2D FIXED");
-  else if(stat==3)
-    Serial.println("3D FIXED");
-  delay(5000);
-
-  gps.getPar(lon,lat,alt,time,vel);
-  Serial.println(lon);
-  Serial.println(lat);
-  Serial.println(alt);
-  Serial.println(time);
-  Serial.println(vel);
-  return 1;
-
-  }
-*/
 void ggps()
 {
   gpsRead();  
@@ -156,15 +118,6 @@ void setup()
   }
   else Serial.println("\nstatus=IDLE");
   pinMode(smokepin, INPUT);
-  /* {
-    GpsSerial.begin(9600);      
-    DebugSerial.println("Wating...");
-    Save_Data.isGetData = false;
-    Save_Data.isParseData = false;
-    Save_Data.isUsefull = false;
-    }
-  */
-
   if (started)
   {
     sendSMS("13051680866", "start");
