@@ -30,7 +30,7 @@ struct
 #include "sms.h"
 //#include "gps.h"
 #include "inetGSM.h"
-SMSGSM sms;
+//SMSGSM sms;
 //GPSGSM gps;
 InetGSM inet;
 int smokepin = A0;
@@ -58,14 +58,14 @@ char datastr[30];
 float value;
 char* valuestr;
 char buffer[4];
-int sendSMS(char* number, char* message)
-{
-  //Enable this two lines if you want to send an SMS.
-  if (sms.SendSMS(number, message))
-    Serial.println("\nSMS sent OK");
-  return 1;
-  return 0;
-}
+//int sendSMS(char* number, char* message)
+//{
+//  //Enable this two lines if you want to send an SMS.
+//  if (sms.SendSMS(number, message))
+//    Serial.println("\nSMS sent OK");
+//  return 1;
+//  return 0;
+//}
 
 void ggps()
 {
@@ -120,7 +120,11 @@ void setup()
   pinMode(smokepin, INPUT);
   if (started)
   {
-    sendSMS("13051680866", "start");
+      gsm.SimpleWrite("AT+CMGS=");
+      gsm.SimpleWriteln("13911952518");
+      gsm.SimpleWriteln("STRAT");
+      gsm.SimpleWrite(0x1A);
+      // sendSMS("13051680866", "start");
     httpg("iot.myworkroom.cn", 80, "/");
     ggps();//lon lat
     delay(1000);
@@ -130,7 +134,7 @@ void setup()
 void loop()
 {
   value = getvalue();
-  if (value > 1000)  sendSMS("13051680866", "fire");
+ // if (value > 1000)     sendSMS("13051680866", "fire");
   ggps();
   valuestr = dtostrf(value, 3, 2, buffer);
   if (Save_Data.isUsefull)
