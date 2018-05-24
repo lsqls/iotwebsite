@@ -19,5 +19,6 @@ from . import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^smoke/',include('smoke.urls',namespace='smoke')),
+    url(r'^box/', include('box.urls', namespace='smoke')),
     url(r'^$',views.test)
 ]
