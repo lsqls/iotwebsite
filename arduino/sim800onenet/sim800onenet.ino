@@ -48,7 +48,7 @@ void loop()
 
 void onenetuploaddata(char* host, int port,char* header,char* raw_request, char* result, int resultlength)
 {
-  if (inet.attachGPRS("3gnet", "", ""))//原本填的是internet.wind,3gnet是联通的接入点，cmnet为移动接入点
+  if (inet.attachGPRS("cmnet", "", ""))//原本填的是internet.wind,3gnet是联通的接入点，cmnet为移动接入点
     Serial.println(F("gprs attached"));
   else Serial.println(F("gprs eorro"));
   delay(1000);
