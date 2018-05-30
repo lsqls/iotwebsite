@@ -16,9 +16,9 @@ Including another URLconf
 from django.conf.urls import url,include
 from django.contrib import admin
 from . import views
+#网站的路径设置，admin：django集成的管理界面，smoke，smoke应用界面，网站根目录是测试界面
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^smoke/',include('smoke.urls',namespace='smoke')),
-    url(r'^box/', include('box.urls', namespace='smoke')),
     url(r'^$',views.test)
 ]

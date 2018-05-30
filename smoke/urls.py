@@ -1,13 +1,9 @@
 from django.conf.urls import url
 from . import views
-
+#smoke应用路径的设置
 urlpatterns = [
-    # ex : /smoke/
-    url(r'^$', views.index, name='index'),
-    # ex : /smoke/upload/100.2-10.3-100.4
- #   url(r'^upload/(\d+.\d+)-(\d+.\d+)-(\d+.\d+)$', views.upload, name='upload'),
-    url(r'^upload/(.+)-(.+)-(.+)$', views.upload, name='upload'),
-    url(r'^mindex$',views.mview,name='phone-view'),
-    url(r'^upload/(.+)$', views.uploadv, name='uploadv'),
-
+    url(r'^$', views.index, name='index'),#PC主页，查看上传数值，曲线图以及设备位置
+    url(r'^upload/(.+)-(.+)-(.+)$', views.upload, name='upload'),#该url用于上传gps数据和传感器数据
+    url(r'^mindex$',views.mview,name='phone-view'),#移动端主页，显示数值
+    url(r'^upload/(.+)$', views.uploadv, name='uploadv'),#该url用于上传传感器数据
 ]

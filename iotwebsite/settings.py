@@ -26,7 +26,7 @@ SECRET_KEY = 'jt#jl64p!l692xk=5wjalz!-x&=eqf=dsmrpyxx300&vk(-@%k'
 DEBUG = True
 
 ALLOWED_HOSTS = [u'0.0.0.0',u'127.0.0.1',u'10.122.234.95',u'123.207.143.140',u'iot.myworkroom.cn']
-
+#需要修改的设置，将需要的访问添加到allowed_hosts中
 
 # Application definition
 
@@ -37,8 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'smoke',
-    "box",
+    'smoke',#将smoke添加到INSTALLED——APPS中
 ]
 
 MIDDLEWARE = [
