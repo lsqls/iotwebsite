@@ -31,7 +31,7 @@ def index(request): #显示主页
     temlist = [x.encode('utf-8') for x in temlist]
     temlist.reverse()
     temlist = unicode(temlist)
-    uploadtimelist = [x.strftime("%H:%M:%S") for x in uploadtimelist]
+    uploadtimelist = [(x+timedelta(hours=8)).strftime("%H:%M:%S") for x in uploadtimelist]
     uploadtimelist.reverse()
     uploadtimelist=unicode(uploadtimelist)
     content={'lastest_record':lastest_record,
