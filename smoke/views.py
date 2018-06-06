@@ -44,13 +44,15 @@ def index(request): #显示主页
     return render(request,'smoke/index.html',content)
 def upload(request,value,tem,longitude,latitude):
     #处理上传数据
+    now = datetime.now()
     lon=float(longitude[0:3])+float(longitude[3:])/60.0#将上传的gps数据处理为标准的度表示法
     lat=float(latitude[0:2])+float(latitude[2:])/60.0
-    info={"value":value,"tem":tem,'longitude':lon,'latitude':lat}#数值-经度-纬度
+    info={"uploadtime":now,"value":value,"tem":tem,'longitude':lon,'latitude':lat}#数值-经度-纬度
     if(smoke.objects.create(**info)):
         return HttpResponse("Upload success")#向客户端返回上传成功的信息
 def uploadv(request,value,tem):
     #同upload功能
-    info={"value":value,'tem':tem}#数值
+    now = datetime.now()
+    info={"uploadtime":now,"value":value,'tem':tem}#数值
     if(smoke.objects.create(**info)):
         return HttpResponse("Upload success")
