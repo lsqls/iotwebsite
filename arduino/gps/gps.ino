@@ -14,7 +14,7 @@ struct//定义用于储存信息的结构体
   char E_W[2];    //E/W
   bool isUsefull;   //定位信息是否有效
 } Save_Data;
-const unsigned int gpsRxBufferLength = 600;
+const unsigned int gpsRxBufferLength = 300;
 char gpsRxBuffer[gpsRxBufferLength];
 unsigned int ii = 0;
 void errorLog(int num)//错误输出

@@ -1,89 +1,157 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>实时空气质量</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/css/mdb.min.css" rel="stylesheet">
-  </head>
-  <body>
-<div id="data" style="position: absolute;left: 10%;top: 10%;height:49%;width:49%">
-                    {% if lastest_record %}
-        <div>上传时间：{{ lastest_record.uploadtime }} </div>
-        <div>空气质量：{{ lastest_record.value }}</div>
-        <div>经纬位置：({{ lastest_record.latitude }},{{ lastest_record.longitude }})</div>
-    {% else %}
-        <p class="p">No datas are available.</p>
-    {% endif %}
-    {% if weekavg %}
-      <div>一周内平均值：{{ weekavg }}</div>
-      {% endif %}
-</div>
-<div id="map"></div>
-
-<div style="position: absolute;left: 50%;top: 1%;height:50%;width:49%">
-<canvas id="lineChart" ></canvas>
-</div>
-<div style="position: absolute;left: 50%;top: 50%;height:50%;width:49%;font-size:500%"> github项目地址<div style="font-size:5px">(实在不知道放什么在这里了)</div>&rarr;&rarr;<a href="https://github.com/lsqls/iotwebsite">iotweb</a></div>
+<!doctype html>
+<html>
+<head>
+    <title>联网型烟雾报警器</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    {% load static %}
+    <script src="{% static "smoke/gauge.min.js" %}"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=bhMbdU4PFSWLoaGPPMIs9ZKF8tsKaFe8"></script>
+</head>
+<body>
 
 
-<style>
-       #map {
-        position: absolute;left: 1%;top: 50%;height:300px;width:49%
-       }
-    </style>
+  <!-- Injecting radial gauge -->
+  <div class="wrap">
+        <canvas id="canvas2"
+                class="left"
+                data-type="radial-gauge"
+                data-width="200"
+                data-height="200"
+                data-units="气体浓度"
+                data-title="false"
+                data-value="{{lastest_record.value}}"
+                data-min-value="0"
+                data-max-value="220"
+                data-major-ticks="0,20,40,60,80,100,120,140,160,180,200,220"
+                data-minor-ticks="2"
+                data-stroke-ticks="false"
+                data-highlights='[
+                    { "from": 0, "to": 50, "color": "rgba(0,255,0,.15)" },
+                    { "from": 50, "to": 100, "color": "rgba(255,255,0,.15)" },
+                    { "from": 100, "to": 150, "color": "rgba(255,30,0,.25)" },
+                    { "from": 150, "to": 200, "color": "rgba(255,0,225,.25)" },
+                    { "from": 200, "to": 220, "color": "rgba(0,0,255,.25)" }
+                ]'
+                data-color-plate="#222"
+                data-color-major-ticks="#f5f5f5"
+                data-color-minor-ticks="#ddd"
+                data-color-title="#fff"
+                data-color-units="#ccc"
+                data-color-numbers="#eee"
+                data-color-needle-start="rgba(240, 128, 128, 1)"
+                data-color-needle-end="rgba(255, 160, 122, .9)"
+                data-value-box="true"
+                data-animation-rule="bounce"
+                data-animation-duration="500"
+                data-font-value="Led"
+                data-animated-value="true"
+        ></canvas>
+      <div id="container1" class="right"></div>
+  </div>
 
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
- <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBK6tEL1KiUML6MxBmqBq6-KJtDnz-XdSk&callback=initMap">
-    </script>
 
-<script>
-      function initMap() {
-        var uluru = {lat: {{ lastest_record.latitude }}, lng: {{ lastest_record.longitude }}};
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 14,
-          center: uluru
-        });
-        var marker = new google.maps.Marker({
-          position: uluru,
-          map: map
-        });
-      }
-    </script>
+  <div class="wrap">
+  <canvas id="canvas2"
+          class="right"
+          data-type="linear-gauge"
+          data-width="100"
+          data-height="300"
+          data-border-radius="20"
+          data-borders="0"
+          data-bar-stroke-width="20"
+          data-minor-ticks="10"
+          data-major-ticks="0,10,20,30,40,50,60,70,80,90,100"
+          data-value="{{ lastest_record.tem }}"
+          data-units="°C"
+          data-color-value-box-shadow="false"
+  ></canvas>
+  <div id="container2" class="right"></div>
+  </div>
+  <div id="allmap"></div>
 
-
-<script>
-var ctxL = document.getElementById("lineChart").getContext('2d');
-var myLineChart = new Chart(ctxL, {
-    type: 'line',
-    data: {
-        labels: ["0","1", "2", "3", "4", "5"],
-        datasets: [
-            {
-                label: "6小时内曲线图",
-                fillColor: "rgba(220,220,220,0.2)",
-                strokeColor: "rgba(220,220,220,1)",
-                pointColor: "rgba(220,220,220,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(220,220,220,1)",
-                data: [{{data5}},{{data4}},{{data3}},{{data2}},{{data1}},{{data0}}]
-            }
-
-        ]
-    },
-    options: {
-        responsive: true
+  <style type="text/css">
+    body, html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+    #allmap{width:100%;height:200px;}
+    #container1{height: 400px;width:70%;}
+    #container2{height: 400px;width:70%;margin-left:100px}
+    #canvas1 {display:inline;margin-left: 100px;margin-top: 100px}
+    #canvas2 {display:inline;margin-left: 100px;margin-top: 50px;}
+    .wrap {
+            display: -webkit-box;
+        }
+        .left,
+        .right {
+            padding: 10px;
     }
-});
+  </style>
+  <script type="text/javascript">
+var dom = document.getElementById("container1");
+var myChart = echarts.init(dom);
+var app = {};
+option = null;
+option = {
+xAxis: {
+   type: 'category',
+   data:{%autoescape off%}{{ uploadtimelist }}{%endautoescape%},
+},
+yAxis: {
+   type: 'value'
+},
+series: [{
+   data: {%autoescape off%}{{ smokelist }}{%endautoescape%},
+   type: 'line',
+   smooth: true
+}]
+};
+;
+if (option && typeof option === "object") {
+myChart.setOption(option, true);
+}
   </script>
-  </body>
+  <script type="text/javascript">
+var dom = document.getElementById("container2");
+var myChart = echarts.init(dom);
+var app = {};
+option = null;
+option = {
+xAxis: {
+   type: 'category',
+   data:{%autoescape off%}{{ uploadtimelist }}{%endautoescape%},
+},
+yAxis: {
+   type: 'value'
+},
+series: [{
+   data: {%autoescape off%}{{ temlist }}{%endautoescape%},
+   type: 'line',
+   smooth: true
+}]
+};
+;
+if (option && typeof option === "object") {
+myChart.setOption(option, true);
+}
+  </script>
+  <script type="text/javascript">
+  	// 百度地图API功能
+  	var map = new BMap.Map("allmap");
+  	var point = new BMap.Point({{ lastest_record.longitude }},{{ lastest_record.latitude }});
+  	var marker = new BMap.Marker(point);  // 创建标注
+  	map.addOverlay(marker);              // 将标注添加到地图中
+  	map.centerAndZoom(point, 15);
+  	var opts = {
+  	  width : 400,     // 信息窗口宽度
+  	  height: 50,     // 信息窗口高度
+  	  title : "设备位置" , // 信息窗口标题
+  	  enableMessage:true,//设置允许信息窗发送短息
+  	}
+  	var infoWindow = new BMap.InfoWindow("经纬度({{ lastest_record.longitude }},{{ lastest_record.latitude }})", opts);  // 创建信息窗口对象
+  	marker.addEventListener("click", function(){
+  		map.openInfoWindow(infoWindow,point); //开启信息窗口
+  	});
+  </script>
+</body>
 </html>

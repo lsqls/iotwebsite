@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>实时空气质量</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/css/mdb.min.css" rel="stylesheet">
+  </head>
+  <body>
+<div id="data" style="position: absolute;left: 10%;top: 10%;height:49%;width:49%">
+                    {% if lastest_record %}
+        <div>上传时间：{{ lastest_record.uploadtime }} </div>
+        <div>空气质量：{{ lastest_record.value }}</div>
+        <div>经纬位置：({{ lastest_record.latitude }},{{ lastest_record.longitude }})</div>
+    {% else %}
+        <p class="p">No datas are available.</p>
+    {% endif %}
+    {% if weekavg %}
+      <div>一周内平均值：{{ weekavg }}</div>
+      {% endif %}
+</div>
+<div id="map"></div>
+
+<div style="position: absolute;left: 50%;top: 1%;height:50%;width:49%">
+<canvas id="lineChart" ></canvas>
+</div>
+<div style="position: absolute;left: 50%;top: 50%;height:50%;width:49%;font-size:500%"> github项目地址<div style="font-size:5px">(实在不知道放什么在这里了)</div>&rarr;&rarr;<a href="https://github.com/lsqls/iotwebsite">iotweb</a></div>
+
+
+<style>
+       #map {
+        position: absolute;left: 1%;top: 50%;height:300px;width:49%
+       }
+</style>
+
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
+
+
+
+        var uluru = {lat: {{ lastest_record.latitude }}, lng: {{ lastest_record.longitude }}};
+
+<style type="text/css">
+		body, html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+		#allmap{width:100%;height:600px;}
+</style>
+
+
+<script>
+var ctxL = document.getElementById("lineChart").getContext('2d');
+var myLineChart = new Chart(ctxL, {
+    type: 'line',
+    data: {
+        labels: ["0","1", "2", "3", "4", "5"],
+        datasets: [
+            {
+                label: "6小时内曲线图",
+                fillColor: "rgba(220,220,220,0.2)",
+                strokeColor: "rgba(220,220,220,1)",
+                pointColor: "rgba(220,220,220,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(220,220,220,1)",
+                data: [{{data5}},{{data4}},{{data3}},{{data2}},{{data1}},{{data0}}]
+            }
+
+        ]
+    },
+    options: {
+        responsive: true
+    }
+});
+  </script>
+  <script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMap.Map("allmap");
+	var point = new BMap.Point(116.417854,39.921988);
+	map.centerAndZoom(point, 12);
+	map.enableScrollWheelZoom();
+	var marker = new BMap.Marker(point);  // 创建标注
+	map.addOverlay(marker);              // 将标注添加到地图中
+	map.centerAndZoom(point, 15);
+	var opts = {
+	  width : 200,     // 信息窗口宽度
+	  height: 100,     // 信息窗口高度
+	  title : "设备位置" , // 信息窗口标题
+	  enableMessage:true,//设置允许信息窗发送短息
+	}
+	var infoWindow = new BMap.InfoWindow("该点为设备所在位置", opts);  // 创建信息窗口对象
+	marker.addEventListener("click", function(){
+		map.openInfoWindow(infoWindow,point); //开启信息窗口
+	});
+</script>
+  </body>
+</html>

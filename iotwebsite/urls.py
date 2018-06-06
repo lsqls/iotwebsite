@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """iotwebsite URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -20,5 +21,5 @@ from . import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^smoke/',include('smoke.urls',namespace='smoke')),
-    url(r'^$',views.test)
+    url(r'^$',views.test),
 ]
