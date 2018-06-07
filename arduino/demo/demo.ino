@@ -22,20 +22,20 @@ struct//定义用于储存gps信息的结构体
   char E_W[2];    //E/W
   bool isUsefull;   //定位信息是否有效
 } Save_Data;
-OneWire  ds(10);  // 连接arduino10引脚
+OneWire  ds(11);  // 连接arduino11引脚
 SMSGSM sms;
 InetGSM inet;
 int numdata;
 boolean started = false;
 int i = 0;
 char msg[50];
-char datastr[30];
+char datastr[50];
 float value;
 char* valuestr;
 float tem;
 char *temstr;
-char buffer[4];
-char Buffer[4];
+char BUFFER[10];
+char Buffer[10];
 int L = 13; //LED指示灯引脚
 const unsigned int gpsRxBufferLength = 300;
 char gpsRxBuffer[gpsRxBufferLength];
@@ -70,7 +70,7 @@ void setup()
 };
 void loop()
 {
-  value = getvalue();//获取烟雾传感器测量得到的数值
+  value = getvalue();//获取烟雾传感器测量得到的数值[
   tem=gettem();
   if (value > 100||tem>50)  
   {
@@ -80,13 +80,18 @@ void loop()
   }
   
   gpsRead();  
-  parseGpsBuffer();//获取gps数据
+  parseGpsBuffer();//获取gps数据//
   printGpsBuffer();
 
 
   delay(3000);
-  valuestr = dtostrf(value, 3, 2, buffer);//将浮点数转化为字符串
+  Serial.println(value);
+  Serial.println(tem);
+  
+  valuestr = dtostrf(value, 3, 2, BUFFER);//将浮点数转化为字符串
   temstr=dtostrf(tem,3,2,Buffer);
+   Serial.println(valuestr);
+  Serial.println(temstr);
   if (Save_Data.isUsefull)
     sprintf(datastr, "/smoke/upload/%s-%s-%s-%s", valuestr,temstr, Save_Data.longitude, Save_Data.latitude);//能接收gps信号，构建含gps数据和烟雾传感器所测数据的字符串
   else
